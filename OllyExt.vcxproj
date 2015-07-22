@@ -512,7 +512,6 @@ copy debug\OllyExt.dll d:\crk\Analysis\OllyDbg2\plugins\
   </ItemGroup>
   <ItemGroup>
     <None Include="Docs\changes.txt" />
-    <None Include="Docs\howto_request_new_os_support.txt" />
     <None Include="Docs\known_issues.txt" />
     <None Include="Docs\license.txt" />
     <None Include="Docs\readme.txt" />

@@ -594,9 +594,6 @@
     <None Include="Docs\changes.txt">
       <Filter>Docs</Filter>
     </None>
-    <None Include="Docs\howto_request_new_os_support.txt">
-      <Filter>Docs</Filter>
-    </None>
     <None Include="Docs\known_issues.txt">
       <Filter>Docs</Filter>
     </None>
