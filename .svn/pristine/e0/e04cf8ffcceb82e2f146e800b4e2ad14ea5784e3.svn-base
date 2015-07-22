@@ -1,0 +1,21 @@
+#pragma once
+
+
+typedef enum
+{
+	PROTECT_FEATURE_RDTSC,
+	NUM_PROTECT_FEATURES,
+
+	INVALID_FEATURE_ID = 0xFFFFFFFF
+} eProtectFeature;
+
+
+void protectInit( void );
+void protectClean( void );
+PCWSTR protectGetFeatureName( eProtectFeature feature );
+void protectEnable( eProtectFeature feature );
+void protectDisable( eProtectFeature feature );
+void protectEnable( PCWSTR feature );
+void protectDisable( PCWSTR feature );
+void protectEnableAll( void );
+void protectDisableAll( void );

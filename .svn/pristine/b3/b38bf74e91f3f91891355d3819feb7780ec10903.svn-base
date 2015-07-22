@@ -1,0 +1,16 @@
+#pragma once
+
+
+#include <windows.h>
+#include <tchar.h>
+#include <string>
+#include "plugin.h"
+#include "beaengine\BeaEngine.h"
+extern "C"
+{
+#include "xed/xed-interface.h"
+};
+
+#include "resource.h"
+#include "Core/Error.h"
+#include "OllyExt.h"

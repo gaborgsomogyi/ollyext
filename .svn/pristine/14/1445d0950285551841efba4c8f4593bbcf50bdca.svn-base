@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{120075bf-304d-4dff-81b8-44677d769fef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{7bea5993-0a7a-4ae5-b6c5-3ecd07834489}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\main">
+      <UniqueIdentifier>{61deae82-4f7d-4345-aac5-c9818add427f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\source\main\OllyExt.cpp">
+      <Filter>Source Files\main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\main\StdAfx.cpp">
+      <Filter>Source Files\main</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\source\main\OllyExt.def">
+      <Filter>Source Files\main</Filter>
+    </None>
+    <None Include="..\source\main\Sources">
+      <Filter>Source Files\main</Filter>
+    </None>
+    <None Include="..\changes.txt" />
+    <None Include="clean.cmd" />
+    <None Include="ddkbuild.cmd" />
+    <None Include="..\source\DIRS" />
+    <None Include="CertMake.bat" />
+    <None Include="Sign.bat" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\source\main\OllyExt.h">
+      <Filter>Source Files\main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\main\StdAfx.h">
+      <Filter>Source Files\main</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

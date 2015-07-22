@@ -1,0 +1,19 @@
+#include "stdafx.h"
+#include "..\OllyExtProtect.h"
+#include "CheckRemoteDebuggerPresent.h"
+
+
+void checkRemoteDebuggerPresentReset( void )
+{
+}
+
+
+void checkRemoteDebuggerPresentApply( bool protect )
+{
+	if( protect )
+	{
+	}
+	else
+	{
+	}
+}

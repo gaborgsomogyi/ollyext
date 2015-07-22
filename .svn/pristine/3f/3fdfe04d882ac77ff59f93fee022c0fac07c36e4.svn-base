@@ -1,0 +1,3 @@
+- Some of the protections contains hardcoded structure offsets which are highly windows
+  version dependent. The actual implementation only contain offsets for win7. I can
+  support additional OS based on specific request.

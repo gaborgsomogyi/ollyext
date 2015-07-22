@@ -1,0 +1,20 @@
+#pragma once
+
+
+extern "C"
+{
+	void nopCmd( void );
+	void rdtscCmd( ULONG* edxOutput, ULONG* eaxOutput );
+
+	void loadIDT( void* address );
+
+	ULONG writeEnable( void );
+	ULONG writeDisable( void );
+	ULONG RDTSCEnable( void );
+	ULONG RDTSCDisable( void );
+
+	void cliCmd( void );
+	void stiCmd( void );
+	void cltCmd( void );
+	void sttCmd( void );
+}

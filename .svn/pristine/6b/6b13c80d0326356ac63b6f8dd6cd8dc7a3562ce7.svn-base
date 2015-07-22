@@ -1,0 +1,27 @@
+#include "stdafx.h"
+#include "OllyExtLocal.h"
+
+
+HMODULE localLoadLibrary( wchar_t* libName )
+{
+	HMODULE hModule = LoadLibrary( libName );
+	PLUGIN_CHECK_ERROR( hModule, return NULL;, UNABLE_TO_FIND_MODULE, libName );
+	return hModule;
+}
+
+
+FARPROC localGetProcAddress( wchar_t* libName, char* procName )
+{
+	HMODULE hModule = localLoadLibrary( libName );
+	if( !hModule ) return NULL;
+
+	FARPROC procAddress = GetProcAddress( hModule, procName );
+	if( !procAddress )
+	{
+		wchar_t procNameW[TEXTLEN];
+		Asciitounicode( procName, strlen( procName ), procNameW, TEXTLEN );
+		PLUGIN_CHECK_ERROR( FALSE, return NULL;, UNABLE_TO_FIND_FUNCTION, libName, procNameW );
+	}
+
+	return procAddress;
+}

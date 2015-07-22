@@ -1,0 +1,5 @@
+#pragma once
+
+
+void kiUserExceptionDispatcherReset( void );
+void kiUserExceptionDispatcherApply( bool protectDRX, bool hideDRX );

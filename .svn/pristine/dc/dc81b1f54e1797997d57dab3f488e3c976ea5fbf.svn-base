@@ -1,0 +1,4 @@
+NAME OllyExt.sys
+EXPORTS
+    DllInitialize PRIVATE
+    DllUnload     PRIVATE

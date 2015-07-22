@@ -1,0 +1,209 @@
+#include "stdafx.h"
+#include "OllyExtRip.h"
+
+
+class Assembly
+{
+public:
+	Assembly():
+	label(),
+	jumpAddress( 0 ),
+	jumpAddressStr(),
+	command()
+	{}
+
+	Assembly( DWORD jumpAddress_, const std::string& jumpAddressStr_, const std::string& command_ ):
+	label(),
+	jumpAddress( jumpAddress_ ),
+	jumpAddressStr( jumpAddressStr_ ),
+	command( command_ )
+	{}
+
+	std::string label;
+	DWORD jumpAddress;
+	std::string jumpAddressStr;
+	std::string command;
+};
+
+
+static bool ripGetAsmFromRange( DWORD start,
+								DWORD size,
+								std::list<DWORD>& rIndices,
+								std::hash_map<DWORD, Assembly>& rAssemblies )
+{
+	PLUGIN_CHECK_ERROR_NO_MB( start && size, return false; );
+
+	// Allocate the necessary memory
+	BYTE* pBuffer = new BYTE[size];
+	PLUGIN_CHECK_ERROR( pBuffer, return false;, UNABLE_TO_ALLOCATE_LOCAL_MEMORY );
+
+	// Read the assembly from the target binary
+	PLUGIN_CHECK_ERROR( Readmemory( pBuffer, start, size, MM_SILENT ),
+		delete [] pBuffer;
+		return false;,
+		UNABLE_TO_READ_REMOTE_PROCESS_MEMORY, start, size );
+
+	// Update indices and the assembly map
+	DWORD ptr = 0;
+	t_disasm da;
+    char defChar = ' ';
+    char result[TEXTLEN];
+	while( ptr < size )
+	{
+		DWORD ip = start + ptr;
+		DWORD cmdSize = Disasm( &pBuffer[ptr],
+								MAXCMDSIZE,
+								ip,
+								NULL,
+								&da,
+								DA_TEXT,
+								NULL,
+								NULL );
+		PLUGIN_CHECK_ERROR( cmdSize,
+			delete [] pBuffer;
+			return false;,
+			UNABLE_TO_DISASSEMBLE_CODE, start + ptr );
+
+		rIndices.push_back( ip );
+
+		char jumpAddressStr[16] = { 0 };
+		sprintf_s( jumpAddressStr, sizeof( jumpAddressStr ), "%08X", da.jmpaddr );
+		memset( result, 0, TEXTLEN );
+		PLUGIN_CHECK_ERROR( WideCharToMultiByte( CP_ACP, 0, da.result, -1, result, TEXTLEN, &defChar, NULL ),
+			delete [] pBuffer;
+			return false;,
+			UNABLE_TO_CONVERT_WCHAR_TO_CHAR, da.result );
+		rAssemblies[ip] = Assembly( da.jmpaddr, jumpAddressStr, result );
+
+		ptr += cmdSize;
+	}
+
+	// Remove buffer
+	delete [] pBuffer;
+
+	return true;
+}
+
+
+static bool ripCalculateJumps( std::list<DWORD>& rIndices,
+								std::hash_map<DWORD, Assembly>& rAssemblies )
+{
+	for( std::list<DWORD>::iterator it = rIndices.begin(); it != rIndices.end(); ++it )
+	{
+		Assembly& rAssembly = rAssemblies[*it];
+
+		// If it's jump or call
+		if( rAssembly.jumpAddress )
+		{
+			std::hash_map<DWORD, Assembly>::iterator targetIt = rAssemblies.find( rAssembly.jumpAddress );
+
+			// Replace ADDRESS with LOC_ADDRESS
+			int pos = rAssembly.command.find( rAssembly.jumpAddressStr );
+			PLUGIN_CHECK_ERROR( pos != -1, return false;, UNABLE_TO_FIND_TARGET_ADDRESS, *it );
+			rAssembly.command.insert( pos, "LOC_" );
+
+			// Set the label for the target
+			if( targetIt != rAssemblies.end() )
+			{
+				char labelStr[16] = { 0 };
+				sprintf_s( labelStr, sizeof( labelStr ), "%08X", *it );
+				(*targetIt).second.label = labelStr;
+			}
+		}
+	}
+
+	return true;
+}
+
+
+static bool ripGetAsmFromRange( std::string& rAsmCode )
+{
+	rAsmCode = "";
+
+	t_dump* pDisasmDump = Getcpudisasmdump();
+	PLUGIN_CHECK_ERROR( pDisasmDump, return false;, UNABLE_TO_GET_DISASSEMBLER_DUMP );
+
+	DWORD bufferSize = pDisasmDump->sel1 - pDisasmDump->sel0;
+
+	std::list<DWORD> indices;
+	std::hash_map<DWORD, Assembly> assemblies;
+
+	PLUGIN_CHECK_ERROR_NO_MB( ripGetAsmFromRange( pDisasmDump->sel0, bufferSize, indices, assemblies ),
+		return false; );
+
+	PLUGIN_CHECK_ERROR_NO_MB( ripCalculateJumps( indices, assemblies ), return false; );
+
+	for( std::list<DWORD>::iterator it = indices.begin(); it != indices.end(); ++it )
+	{
+		Assembly& rAssembly = assemblies[*it];
+
+		if( !rAssembly.label.empty() )
+		{
+			rAsmCode += "LOC_";
+			rAsmCode += rAssembly.label;
+			rAsmCode += ":\n";
+		}
+
+		rAsmCode += "\t";
+		rAsmCode += rAssembly.command;
+		rAsmCode += "\n";
+	}
+
+	return true;
+}
+
+
+static bool ripSendToClipboard( const std::string& rAsmCode )
+{
+	PLUGIN_CHECK_ERROR( OpenClipboard( NULL ), return false;, UNABLE_TO_OPEN_CLIPBOARD );
+
+	PLUGIN_CHECK_ERROR( EmptyClipboard(),
+		CloseClipboard();
+		return false;,
+		UNABLE_TO_CLEAR_CLIPBOARD );
+
+	HGLOBAL clipBuffer = GlobalAlloc( GMEM_DDESHARE, rAsmCode.length() + 1 );
+	PLUGIN_CHECK_ERROR( clipBuffer,
+		CloseClipboard();
+		return false;,
+		UNABLE_TO_ALLOCATE_GLOBAL_MEMORY );
+
+	char* buffer = (char*)GlobalLock( clipBuffer );
+	PLUGIN_CHECK_ERROR( buffer,
+		GlobalFree( clipBuffer );
+		CloseClipboard();
+		return false;,
+		UNABLE_TO_LOCK_GLOBAL_DATA );
+	strcpy_s( buffer, rAsmCode.length() + 1, rAsmCode.c_str() );
+	PLUGIN_CHECK_ERROR( GlobalUnlock( clipBuffer ),
+		GlobalFree( clipBuffer );
+		CloseClipboard();
+		return false;,
+		UNABLE_TO_LOCK_GLOBAL_DATA );
+
+	PLUGIN_CHECK_ERROR( SetClipboardData( CF_TEXT, clipBuffer ),
+		GlobalFree( clipBuffer );
+		CloseClipboard();
+		return false;,
+		UNABLE_TO_OPEN_CLIPBOARD );
+
+	PLUGIN_CHECK_ERROR( !GlobalFree( clipBuffer ),
+		CloseClipboard();
+		return false;,
+		UNABLE_TO_FREE_GLOBAL_MEMORY );
+
+	PLUGIN_CHECK_ERROR( CloseClipboard(), return false;, UNABLE_TO_CLOSE_CLIPBOARD );
+
+	return true;
+}
+
+
+void ripExecute( void )
+{
+	std::string asmCode = "";
+
+	PLUGIN_CHECK_ERROR_NO_MB( ripGetAsmFromRange( asmCode ), return; );
+	PLUGIN_CHECK_ERROR_NO_MB( ripSendToClipboard( asmCode ), return; );
+
+	Addtolist( 0, BLACK, L"OllyExt: Code ripped successfully" );
+}

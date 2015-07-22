@@ -1,0 +1,5 @@
+#pragma once
+
+
+void checkRemoteDebuggerPresentReset( void );
+void checkRemoteDebuggerPresentApply( bool protect );

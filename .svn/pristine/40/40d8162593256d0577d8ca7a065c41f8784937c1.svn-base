@@ -1,0 +1,147 @@
+#include "StdAfx.h"
+#include "protect.h"
+#include "RDTSC.h"
+
+
+typedef void (*InitFunction)( void );
+typedef void (*CleanFunction)( void );
+typedef void (*ProtectFunction)( void );
+typedef void (*UnprotectFunction)( void );
+
+
+PCWSTR g_protectFeatureNames[NUM_PROTECT_FEATURES] =
+{
+	L"RDTSC",
+};
+
+
+InitFunction g_initFunctions[NUM_PROTECT_FEATURES] =
+{
+	&RDTSCInit,
+};
+
+
+CleanFunction g_cleanFunctions[NUM_PROTECT_FEATURES] =
+{
+	&RDTSCClean,
+};
+
+
+ProtectFunction g_protectFunctions[NUM_PROTECT_FEATURES] =
+{
+	&RDTSCProtect,
+};
+
+
+UnprotectFunction g_unprotectFunctions[NUM_PROTECT_FEATURES] =
+{
+	&RDTSCUnprotect,
+};
+
+
+void protectInit( void )
+{
+	for( int i = 0; i < NUM_PROTECT_FEATURES; ++i )
+	{
+		g_initFunctions[i]();
+	}
+}
+
+
+void protectClean( void )
+{
+	for( int i = 0; i < NUM_PROTECT_FEATURES; ++i )
+	{
+		g_cleanFunctions[i]();
+	}
+}
+
+
+const wchar_t* protectGetFeatureName( eProtectFeature feature )
+{
+	if( feature >= NUM_PROTECT_FEATURES )
+	{
+//		gpSyserPluginUI->Outputf( L"\tTrying to get a feature name with an invalid feature ID : %d\n", feature );
+		return L"";
+	}
+
+	return g_protectFeatureNames[feature];
+}
+
+
+eProtectFeature protectGetFeatureID( PCWSTR feature )
+{
+	eProtectFeature featureID = INVALID_FEATURE_ID;
+
+	for( int i = 0; i < NUM_PROTECT_FEATURES; ++i )
+	{
+		if( !wcscmp( feature, g_protectFeatureNames[i] ) )
+		{
+			featureID = (eProtectFeature)i;
+			break;
+		}
+	}
+
+	if( featureID == INVALID_FEATURE_ID )
+	{
+//		gpSyserPluginUI->Outputf( L"Trying to get a feature ID for an invalid feature name %ws\n", feature );
+	}
+
+	return featureID;
+}
+
+
+void protectEnable( eProtectFeature feature )
+{
+	if( feature >= NUM_PROTECT_FEATURES )
+	{
+//		gpSyserPluginUI->Outputf( L"\tTrying to enable an invalid feature ID : %d\n", feature );
+		return;
+	}
+
+	g_protectFunctions[feature]();
+//	gpSyserPluginUI->Outputf( L"\tEnabled %s protection\n", g_protectFeatureNames[feature] );
+}
+
+
+void protectDisable( eProtectFeature feature )
+{
+	if( feature >= NUM_PROTECT_FEATURES )
+	{
+//		gpSyserPluginUI->Outputf( L"\tTrying to disable an invalid feature ID : %d\n", feature );
+		return;
+	}
+
+	g_unprotectFunctions[feature]();
+//	gpSyserPluginUI->Outputf( L"\tDisabled %s protection\n", g_protectFeatureNames[feature] );
+}
+
+
+void protectEnable( PCWSTR feature )
+{
+	eProtectFeature featureID = protectGetFeatureID( feature );
+	if( featureID != INVALID_FEATURE_ID )
+		protectEnable( featureID );
+}
+
+
+void protectDisable( PCWSTR feature )
+{
+	eProtectFeature featureID = protectGetFeatureID( feature );
+	if( featureID != INVALID_FEATURE_ID )
+		protectDisable( featureID );
+}
+
+
+void protectEnableAll( void )
+{
+	for( int i = 0; i < NUM_PROTECT_FEATURES; ++i )
+		protectEnable( (eProtectFeature)i );
+}
+
+
+void protectDisableAll( void )
+{
+	for( int i = 0; i < NUM_PROTECT_FEATURES; ++i )
+		protectDisable( (eProtectFeature)i );
+}

@@ -1,0 +1,12 @@
+#pragma once
+
+
+#define OLLYEXT_VERSION L"1.21"
+
+
+extern wchar_t* g_versionStr;
+extern wchar_t* g_copyrightStr;
+
+
+void versionInit( void );
+void versionDestroy( void );

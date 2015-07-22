@@ -1,0 +1,17 @@
+#ifndef _STDAFX_H_
+#define _STDAFX_H_
+
+
+extern "C"{
+#include <ntddk.h>
+	NTSTATUS DriverEntry( IN PDRIVER_OBJECT DriverObject, IN PUNICODE_STRING RegistryPath );
+}
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "OllyExtIO.h"
+
+
+#endif //_STDAFX_H_

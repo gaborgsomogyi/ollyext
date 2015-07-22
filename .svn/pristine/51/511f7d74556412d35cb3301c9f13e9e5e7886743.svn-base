@@ -1,0 +1,24 @@
+#pragma once
+
+
+typedef struct
+{
+	bool isDebuggerPresent;
+	bool ntGlobalFlag;
+	bool heapFlags;
+	bool forceFlags;
+} sProtectOptions;
+
+
+extern sProtectOptions g_protectOptions;
+
+
+void protectReadOptions( void );
+void protectWriteOptions( void );
+
+void protectReset( void );
+bool protectApply( void );
+bool protectApplyPatch( void* address, BYTE* orig, BYTE* patch, DWORD size );
+bool protectApplyPatch( wchar_t* libName, char* procName, BYTE* orig, BYTE* patch, DWORD size );
+bool protectRevertPatch( void* address, BYTE* orig, DWORD size );
+bool protectRevertPatch( wchar_t* libName, char* procName, BYTE* orig, DWORD size );

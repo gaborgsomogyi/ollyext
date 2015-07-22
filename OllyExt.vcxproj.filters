@@ -1,0 +1,642 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="OllyExt.cpp" />
+    <ClCompile Include="OllyExtMenu.cpp" />
+    <ClCompile Include="OptionsDialog.cpp" />
+    <ClCompile Include="Protections\IsDebuggerPresent.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\NtGlobalFlag.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\HeapFlags.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\ForceFlags.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Bugfixes\Caption.cpp">
+      <Filter>Bugfixes</Filter>
+    </ClCompile>
+    <ClCompile Include="OllyExtAbout.cpp" />
+    <ClCompile Include="Protections\OutputDebugStringA.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\OutputDebugStringW.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\BlockInput.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\NtQueryInformationProcess.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\TerminateProcess.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\SetInformationThread.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\NtQueryObject.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\FindWindowW.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\FindWindowExW.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\FindWindowA.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\FindWindowExA.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\NtOpenProcess.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\Process32NextW.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\Process32Next.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Bugfixes\KillAntiAttach.cpp">
+      <Filter>Bugfixes</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\GetTickCount.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\TimeGetTime.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\QueryPerformanceCounter.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\ZwGetContextThread.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\NtSetContextThread.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\NtQuerySystemInformation.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\NtSetDebugFilterState.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\Process32FirstW.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\Process32First.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\KiUserExceptionDispatcher.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\ZwContinue.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\DbgPrompt.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="OllyExtDisasmMenu.cpp" />
+    <ClCompile Include="beaengineSources\BeaEngine.c">
+      <Filter>beaengineSources</Filter>
+    </ClCompile>
+    <ClCompile Include="OllyExtCodeRip.cpp" />
+    <ClCompile Include="OllyExtDumpMenu.cpp" />
+    <ClCompile Include="OllyExtDataRip.cpp" />
+    <ClCompile Include="OllyExtRip.cpp" />
+    <ClCompile Include="Protections\CreateThread.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="OllyExtSignatureRip.cpp" />
+    <ClCompile Include="Protections\NtSystemDebugControl.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="xed\xed-enc-lang.cpp">
+      <Filter>xed</Filter>
+    </ClCompile>
+    <ClCompile Include="OllyExtDBG.cpp" />
+    <ClCompile Include="Protections\Protect.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Bugfixes\Bugfix.cpp">
+      <Filter>Bugfixes</Filter>
+    </ClCompile>
+    <ClCompile Include="General\General.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Assembler.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Config.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Hook.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Icon.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Integrity.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Local.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\OS.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Remote.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Version.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DBG.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Log.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="OllyExtLog.cpp" />
+    <ClCompile Include="Protections\NtClose.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Protections\Custom.cpp">
+      <Filter>Protections</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Ini.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\vlx.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Res.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="OllyExt.h" />
+    <ClInclude Include="OllyExtMenu.h" />
+    <ClInclude Include="OptionsDialog.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Protections\IsDebuggerPresent.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\NtGlobalFlag.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\HeapFlags.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\ForceFlags.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Bugfixes\Caption.h">
+      <Filter>Bugfixes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\plugin.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="OllyExtAbout.h" />
+    <ClInclude Include="include\detours.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\detver.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\OutputDebugStringA.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\OutputDebugStringW.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\BlockInput.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\NtQueryInformationProcess.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\TerminateProcess.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\SetInformationThread.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\NtQueryObject.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\FindWindowW.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\FindWindowExW.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\FindWindowA.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\FindWindowExA.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\NtOpenProcess.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\Process32NextW.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\Process32Next.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Bugfixes\KillAntiAttach.h">
+      <Filter>Bugfixes</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\GetTickCount.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\TimeGetTime.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\QueryPerformanceCounter.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\ZwGetContextThread.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\NtSetContextThread.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\NtQuerySystemInformation.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\NtSetDebugFilterState.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\Process32FirstW.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\Process32First.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\KiUserExceptionDispatcher.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\ZwContinue.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\DbgPrompt.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="OllyExtDisasmMenu.h" />
+    <ClInclude Include="include\beaengine\basic_types.h">
+      <Filter>include\beaengine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\beaengine\BeaEngine.h">
+      <Filter>include\beaengine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\beaengine\export.h">
+      <Filter>include\beaengine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\beaengine\macros.h">
+      <Filter>include\beaengine</Filter>
+    </ClInclude>
+    <ClInclude Include="OllyExtCodeRip.h" />
+    <ClInclude Include="OllyExtDumpMenu.h" />
+    <ClInclude Include="OllyExtDataRip.h" />
+    <ClInclude Include="OllyExtRip.h" />
+    <ClInclude Include="Protections\CreateThread.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="OllyExtSignatureRip.h" />
+    <ClInclude Include="Protections\NtSystemDebugControl.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="xed\xed-enc-lang.H">
+      <Filter>xed</Filter>
+    </ClInclude>
+    <ClInclude Include="OllyExtDBG.h" />
+    <ClInclude Include="include\xed\xed-address-width-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-agen.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-attribute-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-attributes.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-category-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-chip-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-common-defs.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-common-hdrs.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-convert-table-init.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-decode.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-decode-cache.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-decoded-inst.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-disas.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-encode.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-encoder-gen-defs.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-encoder-hl.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-encoder-iforms.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-error-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-exception-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-extension-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-flag-action-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-flag-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-flags.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-format-options.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-gen-table-defs.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-get-time.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-iclass-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-iform-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-iformfl-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-iform-map.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-ild.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-immdis.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-immed.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-init.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-init-pointer-names.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-inst.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-inst-printer.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-interface.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-isa-set.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-isa-set-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-machine-mode-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-nonterminal-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-operand-accessors.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-operand-action.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-operand-action-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-operand-convert-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-operand-ctype-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-operand-ctype-map.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-operand-element-type-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-operand-element-xtype-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-operand-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-operand-storage.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-operand-type-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-operand-values-interface.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-operand-visibility-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-operand-width-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-portability.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-reg-class.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-reg-class-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-reg-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-reg-role-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-state.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-syntax-enum.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-types.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-util.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xed\xed-version.h">
+      <Filter>include\xed</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\Protect.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Bugfixes\Bugfix.h">
+      <Filter>Bugfixes</Filter>
+    </ClInclude>
+    <ClInclude Include="General\General.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Assembler.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Config.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Error.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Hook.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Icon.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Integrity.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Local.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\OS.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Remote.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Version.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DBG.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Log.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="OllyExtLog.h" />
+    <ClInclude Include="Protections\NtClose.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Protections\Custom.h">
+      <Filter>Protections</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Ini.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\vlx.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Res.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="OllyExt.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="OllyExt.ico" />
+    <None Include="OllyExtSmall.ico" />
+    <None Include="Docs\changes.txt">
+      <Filter>Docs</Filter>
+    </None>
+    <None Include="Docs\howto_request_new_os_support.txt">
+      <Filter>Docs</Filter>
+    </None>
+    <None Include="Docs\known_issues.txt">
+      <Filter>Docs</Filter>
+    </None>
+    <None Include="Docs\license.txt">
+      <Filter>Docs</Filter>
+    </None>
+    <None Include="Docs\readme.txt">
+      <Filter>Docs</Filter>
+    </None>
+    <None Include="OllyExtPatches\Example.ini">
+      <Filter>OllyExtPatches</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Protections">
+      <UniqueIdentifier>{2d2729c4-f943-4310-9d9a-dff3fadd6cc2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{bbb668ed-c392-48b0-8cc4-bb8222eac700}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="beaengineSources">
+      <UniqueIdentifier>{e16ee85a-5f47-4c30-8021-02ecf6dc1980}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\beaengine">
+      <UniqueIdentifier>{afe358ab-62b2-4737-a1c2-e10740a007ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xed">
+      <UniqueIdentifier>{59fd6525-cca3-4c5d-89a7-573b7712e776}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Docs">
+      <UniqueIdentifier>{895a5b59-4c7e-446b-8808-c2780d009d30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{34f174ea-f21d-4b1d-b069-52efd6b0691d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\xed">
+      <UniqueIdentifier>{1d92f6ac-796d-4201-a900-9781bca4cb68}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Bugfixes">
+      <UniqueIdentifier>{bfbd2d13-90c9-4608-9bc5-5c4839cb13a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="General">
+      <UniqueIdentifier>{326fba83-c2de-45a6-ada9-ffae4614b3d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OllyExtPatches">
+      <UniqueIdentifier>{95559df7-94c2-4b47-9bf1-18daa0b0f940}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

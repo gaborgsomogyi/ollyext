@@ -1,0 +1,8 @@
+#pragma once
+
+
+void configSaveBool( const wchar_t* pName, bool value );
+bool configReadBool( const wchar_t* pName, bool defaultValue = false );
+
+void configSaveInt( const wchar_t* pName, int value );
+int configReadInt( const wchar_t* pName, int defaultValue = 0 );

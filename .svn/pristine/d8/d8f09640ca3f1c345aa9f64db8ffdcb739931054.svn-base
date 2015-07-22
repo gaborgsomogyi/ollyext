@@ -1,0 +1,223 @@
+#include "stdafx.h"
+#include "vlx.h"
+#include "OllyExtDriver.h"
+
+
+typedef struct
+{
+	ULONG type;
+	ULONG param1;
+	ULONG param2;
+	ULONG param3;
+	ULONG param4;
+} sDriverCmd;
+
+
+wchar_t* g_serviceName = L"OllyExt";
+wchar_t* g_driverFile = L"OllyExt.sys";
+wchar_t* g_driverAccessName = L"\\\\.\\OllyExt";
+HANDLE g_driver = INVALID_HANDLE_VALUE;
+
+
+
+static bool driverSave( HMODULE hMod, DWORD resourceID, const wchar_t* resourceType, const wchar_t* fileName )
+{
+	HRSRC res = FindResource( hMod, MAKEINTRESOURCE( resourceID ), resourceType );
+	PLUGIN_CHECK_ERROR( res, return false;, UNABLE_TO_FIND_RESOURCE );
+
+	unsigned int resSize = SizeofResource( hMod, res );
+	PLUGIN_CHECK_ERROR( resSize, return false;, UNABLE_TO_GET_RESOURCE_SIZE );
+
+	HGLOBAL resData = LoadResource( hMod, res );
+	PLUGIN_CHECK_ERROR( resData, return false;, UNABLE_TO_LOAD_RESOURCE );
+
+	void* resBinaryData = LockResource( resData );
+	PLUGIN_CHECK_ERROR( resBinaryData, return false;, UNABLE_TO_LOCK_RESOURCE );
+
+	void* resBinaryDataUnpacked = NULL;
+	unsigned int resSizeUnpacked = 0;
+	bool isUnpacked = vlx_decompress( resBinaryData, resSize, &resBinaryDataUnpacked, (DWORD*)&resSizeUnpacked );
+	PLUGIN_CHECK_ERROR( isUnpacked, return false;, UNABLE_TO_UNCOMPRESS_DATA );
+
+    ofstream f( fileName, ios::out | ios::binary );
+	PLUGIN_CHECK_ERROR( !f.fail(),
+		if( resBinaryDataUnpacked )\
+		{\
+			delete [] resBinaryDataUnpacked;\
+			resBinaryDataUnpacked = NULL;\
+		}\
+		return false;,
+		UNABLE_TO_SAVE_FILE_BECAUSE_OF_FAILBIT );
+	PLUGIN_CHECK_ERROR( !f.bad(),
+		if( resBinaryDataUnpacked )\
+		{\
+			delete [] resBinaryDataUnpacked;\
+			resBinaryDataUnpacked = NULL;\
+		}\
+		return false;,
+		UNABLE_TO_SAVE_FILE_BECAUSE_OF_BADBIT );
+    f.write( (char*)resBinaryDataUnpacked, resSizeUnpacked );
+	PLUGIN_CHECK_ERROR( !f.fail(),
+		if( resBinaryDataUnpacked )\
+		{\
+			delete [] resBinaryDataUnpacked;\
+			resBinaryDataUnpacked = NULL;\
+		}\
+		return false;,
+		UNABLE_TO_SAVE_FILE_BECAUSE_OF_FAILBIT );
+	PLUGIN_CHECK_ERROR( !f.bad(),
+		if( resBinaryDataUnpacked )\
+		{\
+			delete [] resBinaryDataUnpacked;\
+			resBinaryDataUnpacked = NULL;\
+		}\
+		return false;,
+		UNABLE_TO_SAVE_FILE_BECAUSE_OF_BADBIT );
+    f.close();
+
+	if( resBinaryDataUnpacked )
+	{
+		delete [] resBinaryDataUnpacked;
+		resBinaryDataUnpacked = NULL;
+	}
+
+	return true;
+}
+
+
+void driverInit( HMODULE hMod )
+{
+	wchar_t driverPath[4096];
+	DWORD winDirLen = GetSystemDirectory( driverPath, sizeof( driverPath ) );
+	PLUGIN_CHECK_ERROR( winDirLen, return;, UNABLE_TO_GET_SYSTEM_DIRECTORY );
+
+	Addtolist( 0, BLACK, L"OllyExt: System directory: %s", driverPath );
+
+	errno_t err = wcscat_s( driverPath, L"\\drivers\\" );
+	PLUGIN_CHECK_ERROR( !err, return;, UNABLE_TO_CONCAT_STRINGS );
+	err = wcscat_s( driverPath, g_driverFile );
+	PLUGIN_CHECK_ERROR( !err, return;, UNABLE_TO_CONCAT_STRINGS );
+
+	bool saved = false;
+	switch( osGetType() )
+	{
+	case OS_XP:
+		switch( osGetArch() )
+		{
+		case ARCH_I386:
+			saved = driverSave( hMod, IDR_OLLYEXTWXPI386, L"DRIVER", g_driverFile );
+		break;
+
+		case ARCH_AMD64:
+//			saved = driverSave( hMod, IDR_OLLYEXTWXPIA64, L"DRIVER", g_driverFile );
+		break;
+		}
+	break;
+
+	case OS_WIN7:
+		switch( osGetArch() )
+		{
+		case ARCH_I386:
+			saved = driverSave( hMod, IDR_OLLYEXTWIN7I386, L"DRIVER", g_driverFile );
+		break;
+
+		case ARCH_AMD64:
+//			saved = driverSave( hMod, IDR_OLLYEXTWIN7AMD64, L"DRIVER", g_driverFile );
+		break;
+		}
+	break;
+	}
+	if( !saved ) return;
+
+	Addtolist( 0, BLACK, L"OllyExt: Copying driver to: %s", driverPath );
+
+	if( !CopyFile( g_driverFile, driverPath, false ) )
+	{
+		PLUGIN_CHECK_ERROR( false,
+			DeleteFile( g_driverFile ); \
+			return;,
+			UNABLE_TO_COPY_DRIVER, driverPath );
+	}
+
+	DeleteFile( g_driverFile );
+
+	SC_HANDLE SCManager = OpenSCManager( NULL, NULL, SC_MANAGER_ALL_ACCESS );
+	PLUGIN_CHECK_ERROR( SCManager, return;, UNABLE_TO_OPEN_SCM );
+
+	SC_HANDLE SCService = OpenService( SCManager, g_serviceName, SERVICE_ALL_ACCESS );
+	if( !SCService )
+	{
+		SCService = CreateService( SCManager, g_serviceName, g_serviceName, SERVICE_ALL_ACCESS,
+									 SERVICE_KERNEL_DRIVER, SERVICE_DEMAND_START,
+									 SERVICE_ERROR_NORMAL, driverPath, NULL, NULL,
+									 NULL, NULL, NULL );
+		PLUGIN_CHECK_ERROR( SCService, return;, UNABLE_TO_CREATE_SERVICE );
+	}
+
+	SERVICE_STATUS status;
+	if( !QueryServiceStatus( SCService, &status ) )
+	{
+		PLUGIN_CHECK_ERROR( false, return;, UNABLE_TO_GET_SERVICE_STATUS );
+	}
+
+	if( status.dwCurrentState != SERVICE_RUNNING &&
+		!StartService( SCService, 0, NULL ) )
+	{
+		PLUGIN_CHECK_ERROR( false, return;, UNABLE_TO_START_SERVICE );
+	}
+
+	if( !CloseServiceHandle( SCService ) )
+	{
+		PLUGIN_CHECK_ERROR( false, return;, UNABLE_TO_CLOSE_SERVICE );
+	}
+
+	g_driver = CreateFile( g_driverAccessName, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, 0 );
+	PLUGIN_CHECK_ERROR( g_driver != INVALID_HANDLE_VALUE, return;, UNABLE_TO_OPEN_DRIVER );
+}
+
+
+void driverDestroy( void )
+{
+	if( g_driver )
+	{
+		CloseHandle( g_driver );
+		g_driver = NULL;
+	}
+
+	SC_HANDLE SCManager = OpenSCManager( NULL, NULL, SC_MANAGER_ALL_ACCESS );
+	PLUGIN_CHECK_ERROR( SCManager, return;, UNABLE_TO_OPEN_SCM );
+
+	SC_HANDLE SCService = OpenService( SCManager, g_serviceName, SERVICE_ALL_ACCESS );
+	PLUGIN_CHECK_ERROR_NO_MB( SCService, return; );
+
+	SERVICE_STATUS status;
+	if( !QueryServiceStatus( SCService, &status ) )
+	{
+		PLUGIN_CHECK_ERROR( false, return;, UNABLE_TO_GET_SERVICE_STATUS );
+	}
+
+	if( status.dwCurrentState == SERVICE_RUNNING &&
+		!ControlService( SCService, SERVICE_CONTROL_STOP, &status ) )
+	{
+		PLUGIN_CHECK_ERROR( false, return;, UNABLE_TO_STOP_SERVICE );
+	}
+}
+
+
+bool driverIsLoaded( void )
+{
+	return ( g_driver != INVALID_HANDLE_VALUE );
+}
+
+
+void driverSendProtectCmd( sDriverCmdType type, bool enable )
+{
+	if( g_driver == INVALID_HANDLE_VALUE ) return;
+
+	DWORD writeOut;
+	sDriverCmd cmd = { 0 };
+	cmd.type = type;
+	cmd.param1 = enable;
+	WriteFile( g_driver, &cmd, sizeof( sDriverCmd ), &writeOut, NULL );
+	PLUGIN_CHECK_ERROR( writeOut == sizeof( sDriverCmd ), return;, UNABLE_TO_SEND_CMD_TO_DRIVER );
+}

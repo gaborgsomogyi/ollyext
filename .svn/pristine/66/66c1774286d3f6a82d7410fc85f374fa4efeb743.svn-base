@@ -1,0 +1,17 @@
+#pragma once
+
+
+typedef struct
+{
+	bool isDebuggerPresent;
+} sOptions;
+
+
+extern sOptions g_options;
+
+
+void protectReadOptions( void );
+void protectWriteOptions( void );
+bool protectApplyPatch( wchar_t* libName, char* procName, BYTE* orig, BYTE* patch, DWORD size );
+bool protectRevertPatch( wchar_t* libName, char* procName, BYTE* orig, DWORD size );
+void protectApply( void );

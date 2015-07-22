@@ -1,0 +1,10 @@
+15.09.2012
+	- IsDebuggerPresent
+	- NtGlobalFlag
+	- HeapFlag
+	- ForceFlag
+	- Caption change
+	- CheckRemoteDebuggerPresent
+
+14.09.2012
+	- Initial version

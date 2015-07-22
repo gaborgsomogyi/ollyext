@@ -1,0 +1,31 @@
+#include "stdafx.h"
+#include "..\OllyExtProtect.h"
+#include "IsDebuggerPresent.h"
+
+
+static bool g_applied = false;
+static BYTE g_patch[] = { 0x31, 0xC0, 0xC3 };
+static BYTE g_orig[sizeof( g_patch )] = { 0 };
+
+
+void isDebuggerPresentReset( void )
+{
+	g_applied = false;
+}
+
+
+void isDebuggerPresentApply( bool protect )
+{
+	if( protect )
+	{
+		if( g_applied ) return;
+		if( protectApplyPatch( L"kernel32.dll", "IsDebuggerPresent", g_orig, g_patch, sizeof( g_patch ) ) )
+			g_applied = true;
+	}
+	else
+	{
+		if( !g_applied ) return;
+		if( protectRevertPatch( L"kernel32.dll", "IsDebuggerPresent", g_orig, sizeof( g_orig ) ) )
+			g_applied = false;
+	}
+}

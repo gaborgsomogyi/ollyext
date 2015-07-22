@@ -1,0 +1,5 @@
+#pragma once
+
+
+void ntGlobalFlagReset( void );
+void ntGlobalFlagApply( bool protect );

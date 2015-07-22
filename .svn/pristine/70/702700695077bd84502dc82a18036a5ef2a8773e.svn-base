@@ -1,0 +1,34 @@
+#include "stdafx.h"
+#include "..\OllyExtProtect.h"
+#include "IsDebuggerPresent.h"
+
+
+#define IS_DEBUGGER_PRESENT_OFFSET ( 0x02 )
+
+
+static bool g_applied = false;
+static BYTE g_patch[] = { 0 };
+static BYTE g_orig[sizeof( g_patch )] = { 0 };
+
+
+void isDebuggerPresentReset( void )
+{
+	g_applied = false;
+}
+
+
+void isDebuggerPresentApply( bool protect )
+{
+	if( protect )
+	{
+		if( g_applied ) return;
+		if( protectApplyPatch( (void*)( peblock + IS_DEBUGGER_PRESENT_OFFSET ), g_orig, g_patch, sizeof( g_patch ) ) )
+			g_applied = true;
+	}
+	else
+	{
+		if( !g_applied ) return;
+		if( protectRevertPatch( (void*)( peblock + IS_DEBUGGER_PRESENT_OFFSET ), g_orig, sizeof( g_orig ) ) )
+			g_applied = false;
+	}
+}

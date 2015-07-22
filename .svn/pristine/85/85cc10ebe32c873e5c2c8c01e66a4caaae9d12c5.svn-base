@@ -1,0 +1,33 @@
+#include "stdafx.h"
+#include "..\OllyExtDriver.h"
+#include "RDTSC.h"
+
+
+static bool g_applied = false;
+
+
+void RDTSCReset( void )
+{
+	g_applied = false;
+}
+
+
+void RDTSCApply( bool protect )
+{
+	if( protect )
+	{
+		if( g_applied ) return;
+
+		driverSendProtectCmd( IOCTL_PROTECT_RDTSC, true );
+
+		g_applied = true;
+	}
+	else
+	{
+		if( !g_applied ) return;
+
+		driverSendProtectCmd( IOCTL_PROTECT_RDTSC, false );
+
+		g_applied = false;
+	}
+}

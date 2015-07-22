@@ -1,0 +1,13 @@
+#pragma once
+
+
+#include <windows.h>
+#include <commctrl.h>
+#include <tchar.h>
+#include <stdio.h>
+#include <stddef.h>
+#include "plugin.h"
+
+#include "resource.h"
+#include "OllyExt.h"
+#include "OllyExtError.h"

@@ -1,0 +1,38 @@
+#include "stdafx.h"
+#include "Core/DBG.h"
+#include "Icon.h"
+
+
+HICON g_hIconSmall = NULL;
+HICON g_hIconBig = NULL;
+
+
+void iconInit( HINSTANCE instance, DWORD iconSmallID, DWORD iconNormalID )
+{
+	g_hIconSmall = LoadIcon( instance, MAKEINTRESOURCE( iconSmallID ) );
+	g_hIconBig = LoadIcon( instance, MAKEINTRESOURCE( iconNormalID ) );
+}
+
+
+void iconDestroy( void )
+{
+	if( g_hIconSmall )
+	{
+		DestroyIcon( g_hIconSmall );
+		g_hIconSmall = NULL;
+	}
+	if( g_hIconBig )
+	{
+		DestroyIcon( g_hIconBig );
+		g_hIconBig = NULL;
+	}
+}
+
+
+void iconApply( void )
+{
+	if( g_hIconSmall )
+		SendMessage( dbgGetMainWindowHWND(), WM_SETICON, ICON_SMALL, (LPARAM)g_hIconSmall );
+	if( g_hIconBig )
+		SendMessage( dbgGetMainWindowHWND(), WM_SETICON, ICON_BIG, (LPARAM)g_hIconBig );
+}

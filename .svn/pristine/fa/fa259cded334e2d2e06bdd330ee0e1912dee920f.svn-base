@@ -1,0 +1,68 @@
+#include "stdafx.h"
+#include "OllyExtPatch.h"
+
+
+bool patchApply( void* address, BYTE* orig, BYTE* patch, DWORD size )
+{
+	PLUGIN_CHECK_ERROR( process, return false;, NO_DEBUGGE );
+
+	if( orig )
+	{
+		BOOL readSuccess = ReadProcessMemory( process, address, orig, size, NULL );
+		PLUGIN_CHECK_ERROR( readSuccess, return false;, UNABLE_TO_READ_MEMORY_AT, address );
+	}
+
+	BOOL writeSuccess = WriteProcessMemory( process, address, patch, size, NULL );
+	PLUGIN_CHECK_ERROR( writeSuccess, return false;, UNABLE_TO_WRITE_MEMORY_AT, address );
+
+	return true;
+}
+
+
+bool patchApply( wchar_t* libName, char* procName, BYTE* orig, BYTE* patch, DWORD size )
+{
+	PLUGIN_CHECK_ERROR( process, return false;, NO_DEBUGGE );
+
+	HMODULE module = LoadLibrary( libName );
+	PLUGIN_CHECK_ERROR( module, return false;, UNABLE_TO_FIND_MODULE, libName );
+
+	FARPROC address = GetProcAddress( module, procName );
+	if( !address )
+	{
+		wchar_t procNameW[TEXTLEN];
+		Asciitounicode( procName, strlen( procName ), procNameW, TEXTLEN );
+		PLUGIN_CHECK_ERROR( FALSE, return false;, UNABLE_TO_FIND_FUNCTION, libName, procNameW );
+	}
+
+	return patchApply( (void*)address, orig, patch, size );
+}
+
+
+bool patchRevert( void* address, BYTE* orig, DWORD size )
+{
+	PLUGIN_CHECK_ERROR( process, return false;, NO_DEBUGGE );
+
+	BOOL success = WriteProcessMemory( process, address, orig, size, NULL );
+	PLUGIN_CHECK_ERROR( success, return false;, UNABLE_TO_WRITE_MEMORY_AT, address );
+
+	return true;
+}
+
+
+bool patchRevert( wchar_t* libName, char* procName, BYTE* orig, DWORD size )
+{
+	PLUGIN_CHECK_ERROR( process, return false;, NO_DEBUGGE );
+
+	HMODULE module = LoadLibrary( libName );
+	PLUGIN_CHECK_ERROR( module, return false;, UNABLE_TO_FIND_MODULE, libName );
+
+	FARPROC address = GetProcAddress( module, procName );
+	if( !address )
+	{
+		wchar_t procNameW[TEXTLEN];
+		Asciitounicode( procName, strlen( procName ), procNameW, TEXTLEN );
+		PLUGIN_CHECK_ERROR( FALSE, return false;, UNABLE_TO_FIND_FUNCTION, libName, procNameW );
+	}
+
+	return patchRevert( (void*)address, orig, size );
+}

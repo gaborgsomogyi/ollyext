@@ -1,0 +1,10 @@
+#pragma once
+
+
+#define	MAX_CPU			(32)	// Logical processors ( MultiCore * HyperThreading )
+#define	MAX_INTERRUPT	(256)
+
+
+void IDTInit( void );
+void* IDTSetHandler( ULONG intNo, void* newHandler );
+void IDTResetHandler( ULONG intNo );

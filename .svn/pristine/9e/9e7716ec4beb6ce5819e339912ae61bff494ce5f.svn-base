@@ -1,0 +1,11 @@
+#pragma once
+
+
+void* remoteAlloc( HANDLE hProcess );
+void remoteFree( HANDLE hProcess, void* remoteAddress );
+bool remoteRead( HANDLE hProcess, void* remoteAddress, DWORD remoteSize, void* localAddress );
+bool remoteWrite( HANDLE hProcess, const void* localAddress, DWORD localSize, void* remoteAddress );
+bool remoteExec( HANDLE hProcess, void* remoteParamAddress, void* remoteCodeAddress );
+FARPROC remoteGetProcAddress( HANDLE hProcess, wchar_t* libName, char* procName );
+bool remotePatchApply( HANDLE hProcess, void* remoteAddress, BYTE* origCode, BYTE* patchCode, DWORD size );
+bool remotePatchApply( HANDLE hProcess, wchar_t* libName, char* procName, BYTE* origCode, BYTE* patchCode, DWORD size );

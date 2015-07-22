@@ -1,0 +1,14 @@
+#pragma once
+
+
+typedef enum
+{
+	OS_UNKNOWN,
+	OS_XP,
+	OS_WIN7,
+} eOSType;
+
+
+void osInit( void );
+void osDestroy( void );
+eOSType osGetType( void );

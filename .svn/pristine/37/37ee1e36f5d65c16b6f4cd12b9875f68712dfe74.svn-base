@@ -1,0 +1,34 @@
+#include "stdafx.h"
+#include "..\OllyExtBugfixes.h"
+#include "Caption.h"
+
+
+static bool g_applied = false;
+static wchar_t g_patch[] = L"Ferrit";
+static wchar_t g_orig[TEXTLEN] = { 0 };
+
+
+void captionApply( bool protect )
+{
+	if( protect )
+	{
+		if( g_applied ) return;
+
+		BOOL getSuccess = GetWindowText( hwollymain, g_orig, TEXTLEN );
+		PLUGIN_CHECK_ERROR( getSuccess, return, UNABLE_TO_GET_WINDOW_TEXT );
+
+		BOOL setSuccess = SetWindowText( hwollymain, g_patch );
+		PLUGIN_CHECK_ERROR( setSuccess, return, UNABLE_TO_SET_WINDOW_TEXT );
+
+		g_applied = true;
+	}
+	else
+	{
+		if( !g_applied ) return;
+
+		BOOL setSuccess = SetWindowText( hwollymain, g_orig );
+		PLUGIN_CHECK_ERROR( setSuccess, return, UNABLE_TO_SET_WINDOW_TEXT );
+
+		g_applied = false;
+	}
+}

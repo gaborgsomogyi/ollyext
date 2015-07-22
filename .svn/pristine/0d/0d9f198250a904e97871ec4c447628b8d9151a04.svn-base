@@ -1,0 +1,5 @@
+#pragma once
+
+
+NTSTATUS driverIOInit( PDRIVER_OBJECT DriverObject );
+void driverIOClean( void );

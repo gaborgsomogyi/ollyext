@@ -1,0 +1,46 @@
+#include "stdafx.h"
+#include "..\OllyExtRemote.h"
+#include "NtGlobalFlag.h"
+
+
+#define NT_GLOBAL_FLAG_OFFSET ( 0x68 )
+
+
+static bool g_applied = false;
+static BYTE g_patch[] = { 0 };
+static BYTE g_orig[sizeof( g_patch )] = { 0 };
+
+
+void ntGlobalFlagReset( void )
+{
+	g_applied = false;
+}
+
+
+void ntGlobalFlagApply( bool protect )
+{
+	if( protect )
+	{
+		if( g_applied ) return;
+
+		DWORD peb = remoteGetPEB( process );
+		if( !peb ) return;
+
+		if( !remotePatchApply( process, (void*)( peb + NT_GLOBAL_FLAG_OFFSET ), g_orig, g_patch, sizeof( g_patch ) ) )
+			return;
+
+		g_applied = true;
+	}
+	else
+	{
+		if( !g_applied ) return;
+
+		DWORD peb = remoteGetPEB( process );
+		if( !peb ) return;
+
+		if( !remotePatchApply( process, (void*)( peb + NT_GLOBAL_FLAG_OFFSET ), NULL, g_orig, sizeof( g_orig ) ) )
+			return;
+
+		g_applied = false;
+	}
+}

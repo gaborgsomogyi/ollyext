@@ -1,0 +1,13 @@
+#pragma once
+
+
+typedef enum
+{
+	IOCTL_PROTECT_RDTSC
+} sDriverCmdType;
+
+
+void driverInit( HMODULE hMod );
+void driverDestroy( void );
+bool driverIsLoaded( void );
+void driverSendProtectCmd( sDriverCmdType type, bool enable );

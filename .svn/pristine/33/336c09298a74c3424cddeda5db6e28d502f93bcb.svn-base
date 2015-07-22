@@ -1,0 +1,42 @@
+OllyExt is a plugin for Olly 2.xx debugger.
+
+The main intention of this plugin is to provide the biggest anti-anti debugging features
+and bugfixes for Olly 2.xx. Updates will come... :)
+
+The currently supported protections are the following:
+	- IsDebuggerPresent
+	- NtGlobalFlag
+	- HeapFlag
+	- ForceFlag
+	- CheckRemoteDebuggerPresent
+	- OutputDebugString
+	- CloseHandle
+	- SeDebugPrivilege
+	- BlockInput
+	- ProcessDebugFlags
+	- ProcessDebugObjectHandle
+	- TerminateProcess
+	- NtSetInformationThread
+	- NtQueryObject
+	- FindWindow
+	- NtOpenProcess
+	- Process32Next
+	- ParentProcess
+	- GetTickCount
+
+The currently supported bugfixes are the following:
+	- Caption change
+	- Kill Anti-Attach ( dll integrity check )
+
+OS support:
+ - Win7 Professional x32 6.1.7601
+ - Win7 Professional x64 6.1.7601
+
+If you have problem with another version just notify me.
+
+About the author:
+
+Created by Ferrit
+Send your bugreports/comments to ferrit.rce@gmail.com
+
+Enjoy :P

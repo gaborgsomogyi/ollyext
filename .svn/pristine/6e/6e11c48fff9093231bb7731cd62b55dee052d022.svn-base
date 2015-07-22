@@ -1,0 +1,46 @@
+#include "StdAfx.h"
+#include "IDT.h"
+#include "ISR.h"
+#include "protect.h"
+
+
+#define VERSION ( "v0.2" )
+#define AUTHOR ( "Ferrit" )
+#define AUTHOR_MAIL ( "ferrit.rce@gmail.com" )
+
+
+void DriverUnload( IN PDRIVER_OBJECT DriverObject )
+{
+	DbgPrint( "OllyExt: DriverUnload\n" );
+
+	protectDisableAll();
+	protectClean();
+	ISRClean();
+
+	driverIOClean();
+}
+
+
+NTSTATUS DriverEntry( IN PDRIVER_OBJECT DriverObject, IN PUNICODE_STRING RegistryPath )
+{
+	DbgPrint( "OllyExt: DriverEntry\n" );
+
+	NTSTATUS status = driverIOInit( DriverObject );
+	if( !NT_SUCCESS( status ) )
+		return status;
+
+	DriverObject->DriverUnload = DriverUnload;
+
+	char buildStr[1024];
+	sprintf( buildStr, "OllyExt : %s Build date : %s %s\n", VERSION, __DATE__, __TIME__ );
+	DbgPrint( buildStr );
+	DbgPrint( "OllyExt: Created by %s\n", AUTHOR );
+	DbgPrint( "OllyExt: Send your bugreports/comments to %s\n", AUTHOR_MAIL );
+	DbgPrint( "OllyExt: Enjoy :P\n" );
+
+	IDTInit();
+	ISRInit();
+	protectInit();
+
+	return status;
+}

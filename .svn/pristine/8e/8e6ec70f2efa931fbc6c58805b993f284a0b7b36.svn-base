@@ -1,0 +1,87 @@
+.686P
+.XMM
+.MODEL	flat, stdcall
+
+INCLUDELIB LIBCMT
+INCLUDELIB OLDNAMES
+
+?IDTSetHandler@@YGPAXKPAX@Z	proto syscall
+?IDTResetHandler@@YGXK@Z proto syscall
+
+.data
+g_oldIntHandler	dd	0
+g_hook			dd	0
+
+.code
+
+int0DInit proc
+	mov		g_oldIntHandler, 0
+
+	push	int0DHandler
+	push	0Dh
+	call	?IDTSetHandler@@YGPAXKPAX@Z
+	mov		g_oldIntHandler, eax
+
+	ret
+int0DInit endp
+
+int0DClean proc
+	push	0Dh
+	call	?IDTResetHandler@@YGXK@Z
+	ret
+int0DClean endp
+
+int0DAddHook proc hook : dword
+	push	edx
+	cli
+	mov		edx, hook
+	mov		dword ptr [g_hook], edx
+	sti
+	pop		edx
+	ret		4
+int0DAddHook endp
+
+int0DHandler proc
+	cmp		g_hook, 0
+	jz		oldHandler
+
+	; Push EAX, ECX, EDX, EBX, original ESP, EBP, ESI, and EDI
+	pushad
+	push    ds
+	push    es
+	push    fs
+	push    gs
+
+	mov     eax, 23h
+	mov     ds, ax
+	mov     es, ax
+	mov     gs, ax
+	mov     eax, 30h
+	mov     fs, ax
+
+	; The hook has to deal with this parameter
+	push	esp
+	call	dword ptr [g_hook]
+	cmp		al, 0
+	jz		oldHandler
+
+	pop     gs
+	pop     fs
+	pop     es
+	pop     ds
+	popad
+	; we need to remove the error code manually
+	add		esp, 4
+	iretd
+
+oldHandler:
+	pop     gs
+	pop     fs
+	pop     es
+	pop     ds
+	popad
+
+	jmp		dword ptr [g_oldIntHandler]
+int0DHandler endp
+
+end

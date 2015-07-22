@@ -1,0 +1,4 @@
+#pragma once
+
+
+void mcpuExec( PKDEFERRED_ROUTINE routine, void* parameters );

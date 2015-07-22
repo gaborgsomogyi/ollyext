@@ -1,0 +1,13 @@
+#pragma once
+
+
+#define PLUGIN_CHECK_ERROR( condition, action, errorFormat, ... ) \
+{ \
+	if( !( condition ) ) \
+	{ \
+		wchar_t s[TEXTLEN]; \
+		wsprintf( s, ( errorFormat ), __VA_ARGS__ ); \
+		MessageBox( NULL, s, PLUGIN_NAME, MB_OK | MB_ICONERROR ); \
+		action; \
+	} \
+}

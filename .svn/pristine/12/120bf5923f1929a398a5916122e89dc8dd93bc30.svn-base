@@ -1,0 +1,14 @@
+#include "stdafx.h"
+#include "OllyExtDBG.h"
+
+
+HANDLE dbgGetProcessHandle( void )
+{
+	return process;
+}
+
+
+DWORD dbgGetProcessID( void )
+{
+	return processid;
+}

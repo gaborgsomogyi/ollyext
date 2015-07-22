@@ -1,0 +1,212 @@
+#include "stdafx.h"
+#include "Caption.h"
+
+
+#define CODE_SIZE ( 0x100 )
+#define ASSEMBLE( cmd, eip, dstAddr ) \
+{ \
+	wchar_t assemblyError[TEXTLEN] = { 0 }; \
+	codeLen = Assemble( cmd, eip, dstAddr, MAXCMDSIZE, 0, assemblyError ); \
+	PLUGIN_CHECK_ERROR( codeLen, \
+		if( g_apiOrigCode ) \
+		{ \
+			delete [] g_apiOrigCode; \
+			g_apiOrigCode = NULL; \
+		} \
+		if( g_hookCodeAddress ) \
+		{ \
+			delete [] g_hookCodeAddress; \
+			g_hookCodeAddress = NULL; \
+		} \
+		return;, \
+		UNABLE_TO_ASSEMBLE_CODE, cmd, eip, assemblyError ); \
+}
+
+#define ASSEMBLE_AND_STEP( cmd, eip, dstAddr ) \
+{ \
+	ASSEMBLE( cmd, eip, dstAddr ); \
+	codeEip += codeLen; \
+	codePtr += codeLen; \
+}
+
+#define LIBNAME ( L"user32.dll" )
+#define PROCNAME ( "SetWindowTextW" )
+
+
+static bool g_applied = false;
+static wchar_t g_captionPatch[] = L"Ferrit";
+static wchar_t g_captionOrig[TEXTLEN] = { 0 };
+static BYTE* g_hookCodeAddress = NULL;
+static BYTE g_apiJmpPatch[] = { 0xE9, 0x00, 0x00, 0x00, 0x00 };
+static DWORD g_apiOrigCodeSize = 0;
+static BYTE* g_apiOrigCode = NULL;
+
+
+void captionApply( bool protect )
+{
+	if( protect )
+	{
+		if( g_applied ) return;
+
+		BOOL getSuccess = GetWindowText( hwollymain, g_captionOrig, TEXTLEN );
+		PLUGIN_CHECK_ERROR( getSuccess, return;, UNABLE_TO_GET_WINDOW_TEXT );
+
+		BOOL setSuccess = SetWindowText( hwollymain, g_captionPatch );
+		PLUGIN_CHECK_ERROR( setSuccess, return;, UNABLE_TO_SET_WINDOW_TEXT );
+
+		HMODULE module = LoadLibrary( LIBNAME );
+		PLUGIN_CHECK_ERROR( module, return;, UNABLE_TO_FIND_MODULE, LIBNAME );
+
+		FARPROC procAddressToPatch = GetProcAddress( module, PROCNAME );
+		if( !procAddressToPatch )
+		{
+			wchar_t procNameW[TEXTLEN];
+			Asciitounicode( PROCNAME, strlen( PROCNAME ), procNameW, TEXTLEN );
+			PLUGIN_CHECK_ERROR( FALSE, return;, UNABLE_TO_FIND_FUNCTION, LIBNAME, procNameW );
+		}
+
+		g_apiOrigCodeSize = 0;
+		DWORD ptr = (DWORD)procAddressToPatch;
+		while( g_apiOrigCodeSize < sizeof( g_apiJmpPatch ) )
+		{
+			t_cmdinfo ci;
+			DWORD codeLen = Cmdinfo( (BYTE*)ptr, MAXCMDSIZE, ptr, &ci, 0, NULL );
+			PLUGIN_CHECK_ERROR( codeLen, return;, UNABLE_TO_DISASSEMBLE_CODE, ptr );
+			ptr += codeLen;
+			g_apiOrigCodeSize += codeLen;
+		}
+
+		g_apiOrigCode = new BYTE[g_apiOrigCodeSize];
+		PLUGIN_CHECK_ERROR( g_apiOrigCode, return;, UNABLE_TO_ALLOCATE_MEMORY );
+
+		memcpy( g_apiOrigCode, (const void*)procAddressToPatch, g_apiOrigCodeSize );
+
+		g_hookCodeAddress = new BYTE[CODE_SIZE];
+		PLUGIN_CHECK_ERROR( g_hookCodeAddress,
+			if( g_apiOrigCode ) \
+			{ \
+				delete [] g_apiOrigCode; \
+				g_apiOrigCode = NULL; \
+			} \
+			return;,
+			UNABLE_TO_ALLOCATE_MEMORY );
+
+		DWORD codePtr = 0;
+		DWORD codeEip = (DWORD)g_hookCodeAddress;
+		size_t codeLen = 0;
+		wchar_t s[32];
+
+		// Save registers
+		ASSEMBLE_AND_STEP( L"pushad", codeEip, &g_hookCodeAddress[codePtr] );
+		ASSEMBLE_AND_STEP( L"pushfd", codeEip, &g_hookCodeAddress[codePtr] );
+
+		// If olly main window text tried to change then skip it
+		ASSEMBLE_AND_STEP( L"mov eax, esp", codeEip, &g_hookCodeAddress[codePtr] );
+		ASSEMBLE_AND_STEP( L"add eax, 0x28", codeEip, &g_hookCodeAddress[codePtr] );
+		ASSEMBLE_AND_STEP( L"mov edx, [eax]", codeEip, &g_hookCodeAddress[codePtr] );
+		wsprintf( s, L"cmp edx, 0x%08X", hwollymain );
+		ASSEMBLE_AND_STEP( s, codeEip, &g_hookCodeAddress[codePtr] );
+		// Address is unknown at this moment
+		// because of this has to be overwritten
+		DWORD jnzEip = codeEip;
+		DWORD jnzPtr = codePtr;
+		wsprintf( s, L"jnz 0x%08X", codeEip );
+		ASSEMBLE_AND_STEP( s, codeEip, &g_hookCodeAddress[codePtr] );
+
+		// Restore registers and return to user code
+		ASSEMBLE_AND_STEP( L"popfd", codeEip, &g_hookCodeAddress[codePtr] );
+		ASSEMBLE_AND_STEP( L"popad", codeEip, &g_hookCodeAddress[codePtr] );
+		ASSEMBLE_AND_STEP( L"mov eax, 1", codeEip, &g_hookCodeAddress[codePtr] );
+		ASSEMBLE_AND_STEP( L"ret 8", codeEip, &g_hookCodeAddress[codePtr] );
+
+		// Now we know the address where to jump so patch it
+		wsprintf( s, L"jnz 0x%08X", codeEip );
+		ASSEMBLE( s, jnzEip, &g_hookCodeAddress[jnzPtr] );
+
+		// Restore registers and continue
+		ASSEMBLE_AND_STEP( L"popfd", codeEip, &g_hookCodeAddress[codePtr] );
+		ASSEMBLE_AND_STEP( L"popad", codeEip, &g_hookCodeAddress[codePtr] );
+		memcpy( &g_hookCodeAddress[codePtr], g_apiOrigCode, g_apiOrigCodeSize );
+		codeEip += g_apiOrigCodeSize;
+		codePtr += g_apiOrigCodeSize;
+		t_cmdinfo ci;
+		codeLen = Cmdinfo( (BYTE*)procAddressToPatch, MAXCMDSIZE, (DWORD)procAddressToPatch, &ci, 0, NULL );
+		PLUGIN_CHECK_ERROR( codeLen,
+			if( g_apiOrigCode )
+			{
+				delete [] g_apiOrigCode;
+				g_apiOrigCode = NULL;
+			}
+			if( g_hookCodeAddress )
+			{
+				delete [] g_hookCodeAddress;
+				g_hookCodeAddress = NULL;
+			}
+			return;,
+			UNABLE_TO_DISASSEMBLE_CODE, ptr );
+		wsprintf( s, L"jmp 0x%08X", ci.jmpaddr ? ci.jmpaddr : (DWORD)procAddressToPatch + g_apiOrigCodeSize );
+		ASSEMBLE_AND_STEP( s, codeEip, &g_hookCodeAddress[codePtr] );
+
+		// Hook the API
+		wsprintf( s, L"jmp 0x%08X", g_hookCodeAddress );
+		wchar_t error[TEXTLEN] = { 0 };
+		codeLen = Assemble( s, (DWORD)procAddressToPatch, (BYTE*)g_apiJmpPatch, MAXCMDSIZE, 0, error );
+		PLUGIN_CHECK_ERROR( codeLen,
+			if( g_apiOrigCode )
+			{
+				delete [] g_apiOrigCode;
+				g_apiOrigCode = NULL;
+			}
+			if( g_hookCodeAddress )
+			{
+				delete [] g_hookCodeAddress;
+				g_hookCodeAddress = NULL;
+			}
+			return;,
+			UNABLE_TO_ASSEMBLE_CODE, s, &g_apiJmpPatch[1], error );
+
+		DWORD oldProtect = 0;
+		VirtualProtect( (void*)procAddressToPatch, sizeof( g_apiJmpPatch ), PAGE_EXECUTE_READWRITE, &oldProtect );
+		memcpy( (void*)procAddressToPatch, g_apiJmpPatch, sizeof( g_apiJmpPatch ) );
+		VirtualProtect( (void*)procAddressToPatch, sizeof( g_apiJmpPatch ), oldProtect, &oldProtect );
+
+		g_applied = true;
+	}
+	else
+	{
+		if( !g_applied ) return;
+
+		HMODULE module = LoadLibrary( LIBNAME );
+		PLUGIN_CHECK_ERROR( module, return;, UNABLE_TO_FIND_MODULE, LIBNAME );
+
+		FARPROC procAddressToPatch = GetProcAddress( module, PROCNAME );
+		if( !procAddressToPatch )
+		{
+			wchar_t procNameW[TEXTLEN];
+			Asciitounicode( PROCNAME, strlen( PROCNAME ), procNameW, TEXTLEN );
+			PLUGIN_CHECK_ERROR( FALSE, return;, UNABLE_TO_FIND_FUNCTION, LIBNAME, procNameW );
+		}
+
+		DWORD oldProtect = 0;
+		VirtualProtect( (void*)procAddressToPatch, g_apiOrigCodeSize, PAGE_EXECUTE_READWRITE, &oldProtect );
+		memcpy( (void*)procAddressToPatch, g_apiOrigCode, g_apiOrigCodeSize );
+		VirtualProtect( (void*)procAddressToPatch, g_apiOrigCodeSize, oldProtect, &oldProtect );
+
+		if( g_apiOrigCode )
+		{
+			delete [] g_apiOrigCode;
+			g_apiOrigCode = NULL;
+		}
+		
+		if( g_hookCodeAddress )
+		{
+			delete [] g_hookCodeAddress;
+			g_hookCodeAddress = NULL;
+		}
+		
+		BOOL setSuccess = SetWindowText( hwollymain, g_captionOrig );
+		PLUGIN_CHECK_ERROR( setSuccess, return;, UNABLE_TO_SET_WINDOW_TEXT );
+
+		g_applied = false;
+	}
+}

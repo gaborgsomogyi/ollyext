@@ -1,0 +1,32 @@
+#pragma once
+
+
+typedef struct
+{
+	bool isDebuggerPresent;
+	bool ntGlobalFlag;
+	bool heapFlags;
+	bool forceFlags;
+	bool checkRemoteDebuggerPresent;
+	bool outputDebugString;
+	bool closeHandle;
+	bool seDebugPrivilege;
+	bool blockInput;
+	bool processDebugFlags;
+	bool processDebugObjectHandle;
+	bool terminateProcess;
+	bool ntSetInformationThread;
+	bool ntQueryObject;
+	bool findWindow;
+	bool ntOpenProcess;
+	bool process32Next;
+} sProtectOptions;
+
+
+extern sProtectOptions g_protectOptions;
+
+
+void protectReadOptions( void );
+void protectWriteOptions( void );
+void protectReset( void );
+bool protectApply( void );

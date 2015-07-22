@@ -1,0 +1,6 @@
+#pragma once
+
+
+void customInit( void );
+void customReset( void );
+bool customApply( bool enabled );

@@ -1,0 +1,51 @@
+30.09.2012
+	- Kill Anti-Attach ( dll integrity check )
+
+30.09.2012
+	- Hook framework rewritten
+	- Remote string transfer fixed
+
+27.09.2012
+	- Process32Next
+
+26.09.2012
+	- FindWindowA
+	- FindWindowExA
+	- FindWindowW
+	- FindWindowExW
+	- NtOpenProcess
+	- Lot of internal changes in order to make everything consistent
+
+24.09.2012
+	- NtQueryObject
+
+23.09.2012
+	- TerminateProcess
+	- NtSetInformationThread
+
+22.09.2012
+	- ProcessDebugFlags
+	- ProcessDebugObjectHandle
+
+21.09.2012
+	- SeDebugPrivilege
+	- BlockInput
+
+20.09.2012
+	- CloseHandle
+
+19.09.2012
+	- OutputDebugString
+
+18.09.2012
+	- CheckRemoteDebuggerPresent
+
+15.09.2012
+	- IsDebuggerPresent
+	- NtGlobalFlag
+	- HeapFlag
+	- ForceFlag
+	- Caption change
+
+14.09.2012
+	- Initial version

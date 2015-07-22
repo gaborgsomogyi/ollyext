@@ -1,0 +1,12 @@
+#pragma once
+
+
+void osInit( void );
+void osDestroy( void );
+
+// System specific values
+DWORD osGetBeingDebuggedOffset( void );
+DWORD osGetProcessHeapsOffset( void );
+DWORD osGetNtGlobalFlagOffset( void );
+DWORD osGetFlagsOffset( void );
+DWORD osGetForceFlagsOffset( void );

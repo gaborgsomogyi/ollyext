@@ -1,0 +1,7 @@
+#pragma once
+
+
+HWND dbgGetMainWindowHWND( void );
+const wchar_t* dbgGetProcessName( void );
+HANDLE dbgGetProcessHandle( void );
+DWORD dbgGetProcessID( void );
