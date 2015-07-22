@@ -51,17 +51,10 @@ The currently supported bugfixes are the following:
 	- Kill Anti-Attach ( dll integrity check )
 
 Requirements:
- - Microsoft Visual C++ 2010 Redistributable Package (x86)
+ - Visual C++ Redistributable Packages for Visual Studio 2013 (x86)
 
 OS support:
- - Windows XP
- - Windows Server 2003 R2
- - Windows Server 2008 R2
- - Windows 7
- - Windows Server 2012
- - Windows 8
- - Windows Server 2012 R2
- - Windows 8.1
+ - Every x86 OS where microsoft symbol server provides information
 
 Limitations:
  - Because of missing PDK function data ripping is ONLY on 2.01 latest supported
