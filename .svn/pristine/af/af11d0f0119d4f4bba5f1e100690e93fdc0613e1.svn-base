@@ -1,5 +1,0 @@
-#pragma once
-
-
-HMODULE localLoadLibrary( wchar_t* libName );
-FARPROC localGetProcAddress( wchar_t* libName, char* procName );

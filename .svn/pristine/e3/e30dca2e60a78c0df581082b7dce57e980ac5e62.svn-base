@@ -1,7 +1,0 @@
-#pragma once
-
-
-bool patchApply( void* address, BYTE* orig, BYTE* patch, DWORD size );
-bool patchApply( wchar_t* libName, char* procName, BYTE* orig, BYTE* patch, DWORD size );
-bool patchRevert( void* address, BYTE* orig, DWORD size );
-bool patchRevert( wchar_t* libName, char* procName, BYTE* orig, DWORD size );

@@ -1,5 +1,0 @@
-#pragma once
-
-
-HANDLE dbgGetProcessHandle( void );
-DWORD dbgGetProcessID( void );

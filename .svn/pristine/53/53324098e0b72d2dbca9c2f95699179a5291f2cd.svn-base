@@ -1,9 +1,0 @@
-16.04.2013
-	- Symlink deleted in driverIOClean
-
-11.04.2013
-	- Driver suppport removed from x64 architecture
-	- RDTSC
-
-23.03.2013
-	- Initial version

@@ -1,4 +1,0 @@
-#pragma once
-
-
-NTSTATUS DriverEntry( IN PDRIVER_OBJECT DriverObject, IN PUNICODE_STRING RegistryPath );

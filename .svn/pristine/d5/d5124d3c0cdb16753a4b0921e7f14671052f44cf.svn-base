@@ -1,5 +1,0 @@
-#pragma once
-
-
-void ISRInit( void );
-void ISRClean( void );

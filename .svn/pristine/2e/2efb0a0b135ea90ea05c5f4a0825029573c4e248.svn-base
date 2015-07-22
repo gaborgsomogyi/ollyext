@@ -1,5 +1,0 @@
-#pragma once
-
-
-void driverInit( HMODULE hMod );
-void driverDestroy( void );

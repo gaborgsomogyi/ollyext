@@ -1,7 +1,0 @@
-#pragma once
-
-
-void RDTSCInit( void );
-void RDTSCClean( void );
-void RDTSCProtect( void );
-void RDTSCUnprotect( void );

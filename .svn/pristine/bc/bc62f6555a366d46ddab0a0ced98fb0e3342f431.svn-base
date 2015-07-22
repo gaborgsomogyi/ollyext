@@ -1,5 +1,0 @@
-#pragma once
-
-
-bool patchApply( HANDLE hProcess, void* address, BYTE* orig, BYTE* patch, DWORD size );
-bool patchApply( HANDLE hProcess, wchar_t* libName, char* procName, BYTE* orig, BYTE* patch, DWORD size );

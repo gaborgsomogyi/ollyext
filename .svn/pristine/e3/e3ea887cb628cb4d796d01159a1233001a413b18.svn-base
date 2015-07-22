@@ -1,3 +1,0 @@
-set WINDDK_PATH=C:\WinDDK\7600.16385.1\bin\amd64
-
-%WINDDK_PATH%\SignTool sign /s OllyExt ..\bin\plugin\%1\%2\OllyExt.sys

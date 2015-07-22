@@ -1,3 +1,0 @@
-@echo on
-
-vlx a ..\bin\plugin\%1\%2\OllyExt.sys ..\bin\plugin\%1\%2\OllyExt.sys

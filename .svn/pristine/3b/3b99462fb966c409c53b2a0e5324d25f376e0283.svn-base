@@ -1,5 +1,0 @@
-#pragma once
-
-
-void seDebugPrivilegeReset( void );
-void seDebugPrivilegeApply( bool protect );

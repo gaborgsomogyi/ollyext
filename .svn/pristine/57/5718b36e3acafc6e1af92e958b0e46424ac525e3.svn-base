@@ -1,7 +1,0 @@
-- If ollydbg.exe renamed to any other name then the internal main window variable is NULL.
-  Because of this some of the protection not working properly with renamed executable.
-  The workaround is simply don't rename :) Bug reported to Oleh.
-
-- Some of the protections contains hardcoded structure offsets which are highly windows
-  version dependent. The actual implementation only contain offsets for win7. I can
-  support additional OS based on specific request.

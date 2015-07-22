@@ -1,5 +1,0 @@
-[OllyExt]
-Name=No more messagebox :)
-Module=user32.dll
-Function=MessageBoxW
-Patch=C21000

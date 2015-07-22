@@ -1,5 +1,0 @@
-#pragma once
-
-
-void RDTSCReset( void );
-void RDTSCApply( bool protect );
