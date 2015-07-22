@@ -1,166 +1,27 @@
 #include "stdafx.h"
 #include <dbghelp.h>
 #include "Log.h"
+#include "Reg.h"
 #include "OS.h"
 
 
-struct OSDETECTEDVERSION
-{
-	wchar_t* osName;
-
-	// ntdll->_PEB->BeingDebugged
-	DWORD BeingDebugged;
-
-	// ntdll->_PEB->ProcessHeaps
-	DWORD ProcessHeaps;
-
-	// ntdll->_PEB->NtGlobalFlag
-	DWORD NtGlobalFlag;
-
-	// ntdll->_HEAP->Flags
-	DWORD Flags;
-
-	// ntdll->_HEAP->ForceFlags
-	DWORD ForceFlags;
-};
-
-struct OSVERSIONINFOEX_
-{
-    DWORD dwMajorVersion;
-    DWORD dwMinorVersion;
-	WORD wServicePackMajor;
-	BYTE wProductType;
-
-	OSDETECTEDVERSION detectedVersion;
-};
+#define REG_KEY_NAME ( L"Software\\Microsoft\\Windows NT\\CurrentVersion" )
 
 
-const OSVERSIONINFOEX_ g_windowsVersions[] =
-{
-	{ 5, 1, 0, 0, { L"XP", 0x00000002, 0x00000018, 0x00000068, 0x0000000C, 0x00000010 } },
-	{ 5, 1, 1, 0, { L"XP SP1", 0x00000002, 0x00000018, 0x00000068, 0x0000000C, 0x00000010 } },
-	{ 5, 1, 2, 0, { L"XP SP2", 0x00000002, 0x00000018, 0x00000068, 0x0000000C, 0x00000010 } },
-	{ 5, 1, 3, 0, { L"XP SP3", 0x00000002, 0x00000018, 0x00000068, 0x0000000C, 0x00000010 } },
+// ntdll->_PEB->BeingDebugged
+static DWORD g_osBeingDebuggedOffset = 0;
 
-//	{ 5, 2, 0, 0 }, // Server 2003
-	{ 5, 2, 1, 0, { L"Server 2003 SP1", 0x00000002, 0x00000018, 0x00000068, 0x0000000C, 0x00000010 } },
-	{ 5, 2, 2, 0, { L"Server 2003 SP2", 0x00000002, 0x00000018, 0x00000068, 0x0000000C, 0x00000010 } },
+// ntdll->_PEB->ProcessHeaps
+static DWORD g_osProcessHeapsOffset = 0;
 
-//	{ 6, 0, 0, VER_NT_WORKSTATION }, // Vista
-//	{ 6, 0, 1, VER_NT_WORKSTATION }, // Vista SP1
-//	{ 6, 0, 2, VER_NT_WORKSTATION }, // Vista SP2
+// ntdll->_PEB->NtGlobalFlag
+static DWORD g_osNtGlobalFlagOffset = 0;
 
-//	{ 6, 0, 0, VER_NT_SERVER }, // Server 2008
-//	{ 6, 0, 1, VER_NT_SERVER }, // Server 2008 SP1
-//	{ 6, 0, 2, VER_NT_SERVER }, // Server 2008 SP1
+// ntdll->_HEAP->Flags
+static DWORD g_osFlagsOffset = 0;
 
-	{ 6, 1, 0, VER_NT_SERVER, { L"Server 2008 R2", 0x00000002, 0x00000018, 0x00000068, 0x00000040, 0x00000044 } },
-	{ 6, 1, 1, VER_NT_SERVER, { L"Server 2008 R2 SP1", 0x00000002, 0x00000018, 0x00000068, 0x00000040, 0x00000044 } },
-
-	{ 6, 1, 0, VER_NT_WORKSTATION, { L"7", 0x00000002, 0x00000018, 0x00000068, 0x00000040, 0x00000044 } },
-	{ 6, 1, 1, VER_NT_WORKSTATION, { L"7 SP1", 0x00000002, 0x00000018, 0x00000068, 0x00000040, 0x00000044 } },
-
-	{ 6, 2, 0, VER_NT_SERVER, { L"Server 2012", 0x00000002, 0x00000018, 0x00000068, 0x00000040, 0x00000044 } },
-	{ 6, 2, 0, VER_NT_WORKSTATION, { L"8", 0x00000002, 0x00000018, 0x00000068, 0x00000040, 0x00000044 } },
-
-	{ 6, 3, 0, VER_NT_SERVER, { L"Server 2012 R2", 0x00000002, 0x00000018, 0x00000068, 0x00000040, 0x00000044 } },
-	{ 6, 3, 0, VER_NT_WORKSTATION, { L"8.1", 0x00000002, 0x00000018, 0x00000068, 0x00000040, 0x00000044 } },
-};
-
-
-static OSVERSIONINFOEX_ g_osVersion = { 0, 0, 0, 0, { L"UNKNOWN", 0x00000000, 0x00000000, 0x00000000, 0x00000000 } };
-
-
-static BOOL osEqualsMajorVersion( DWORD majorVersion )
-{
-    OSVERSIONINFOEX osVersionInfo;
-    ZeroMemory( &osVersionInfo, sizeof( OSVERSIONINFOEX ) );
-    osVersionInfo.dwOSVersionInfoSize = sizeof( OSVERSIONINFOEX );
-    osVersionInfo.dwMajorVersion = majorVersion;
-    ULONGLONG maskCondition = VerSetConditionMask( 0, VER_MAJORVERSION, VER_EQUAL );
-    return VerifyVersionInfo( &osVersionInfo, VER_MAJORVERSION, maskCondition );
-}
-
-
-static BOOL osEqualsMinorVersion( DWORD minorVersion )
-{
-    OSVERSIONINFOEX osVersionInfo;
-    ZeroMemory( &osVersionInfo, sizeof( OSVERSIONINFOEX ) );
-    osVersionInfo.dwOSVersionInfoSize = sizeof( OSVERSIONINFOEX );
-    osVersionInfo.dwMinorVersion = minorVersion;
-    ULONGLONG maskCondition = VerSetConditionMask( 0, VER_MINORVERSION, VER_EQUAL );
-    return VerifyVersionInfo( &osVersionInfo, VER_MINORVERSION, maskCondition );
-}
-
-
-static BOOL osEqualsServicePack( WORD servicePackMajor )
-{
-    OSVERSIONINFOEX osVersionInfo;
-    ZeroMemory( &osVersionInfo, sizeof( OSVERSIONINFOEX ) );
-    osVersionInfo.dwOSVersionInfoSize = sizeof( OSVERSIONINFOEX );
-    osVersionInfo.wServicePackMajor = servicePackMajor;
-    ULONGLONG maskCondition = VerSetConditionMask( 0, VER_SERVICEPACKMAJOR, VER_EQUAL );
-    return VerifyVersionInfo( &osVersionInfo, VER_SERVICEPACKMAJOR, maskCondition );
-}
-
-
-static BOOL osEqualsProductType( BYTE productType )
-{
-    OSVERSIONINFOEX osVersionInfo;
-    ZeroMemory( &osVersionInfo, sizeof( OSVERSIONINFOEX ) );
-    osVersionInfo.dwOSVersionInfoSize = sizeof( OSVERSIONINFOEX );
-    osVersionInfo.wProductType = productType;
-    ULONGLONG maskCondition = VerSetConditionMask( 0, VER_PRODUCT_TYPE, VER_EQUAL );
-    return VerifyVersionInfo( &osVersionInfo, VER_PRODUCT_TYPE, maskCondition );
-}
-
-
-static BYTE osGetProductType( void )
-{
-    if( osEqualsProductType( VER_NT_WORKSTATION ) )
-    {
-        return VER_NT_WORKSTATION;
-    }
-    else if( osEqualsProductType( VER_NT_DOMAIN_CONTROLLER ) )
-    {
-        return VER_NT_DOMAIN_CONTROLLER;
-    }
-    else if( osEqualsProductType( VER_NT_SERVER ) )
-    {
-        return VER_NT_SERVER;
-    }
-    return 0;
-}
-
-
-static BOOL GetVersionEx_( OSVERSIONINFOEX_& rOSVersionInfoEx )
-{
-	WORD wProductType = osGetProductType();
-
-	for( DWORD i = 0; i < sizeof( g_windowsVersions ) / sizeof( OSVERSIONINFOEX_ ); ++i )
-	{
-		if( osEqualsMajorVersion( g_windowsVersions[i].dwMajorVersion ) )
-		{
-			if( osEqualsMinorVersion( g_windowsVersions[i].dwMinorVersion ) )
-			{
-				if( osEqualsServicePack( g_windowsVersions[i].wServicePackMajor ) )
-				{
-					if( !g_windowsVersions[i].wProductType || g_windowsVersions[i].wProductType == wProductType )
-					{
-						rOSVersionInfoEx.dwMajorVersion = g_windowsVersions[i].dwMajorVersion;
-						rOSVersionInfoEx.dwMinorVersion = g_windowsVersions[i].dwMinorVersion;
-						rOSVersionInfoEx.wServicePackMajor = g_windowsVersions[i].wServicePackMajor;
-
-						rOSVersionInfoEx.detectedVersion = g_windowsVersions[i].detectedVersion;
-
-						return TRUE;
-					}
-				}
-			}
-		}
-	}
-	return FALSE;
-}
+// ntdll->_HEAP->ForceFlags
+static DWORD g_osForceFlagsOffset = 0;
 
 
 static DWORD osGetModuleOffsetInStruct( const std::wstring& rModule, const std::wstring& rStruct, const std::wstring& rMember )
@@ -267,45 +128,43 @@ static DWORD osGetModuleOffsetInStruct( const std::wstring& rModule, const std::
 
 void osInit( void )
 {
-	OSVERSIONINFOEX_ osvi;
-
-	// Get the Windows version.
-	ZeroMemory( &osvi, sizeof( osvi ) );
-	if( !GetVersionEx_( osvi ) )
+	const wchar_t* productName = regReadValue( HKEY_LOCAL_MACHINE, REG_KEY_NAME, L"ProductName" );
+	const wchar_t* currentVersion = regReadValue( HKEY_LOCAL_MACHINE, REG_KEY_NAME, L"CurrentVersion" );
+	const wchar_t* currentBuild = regReadValue( HKEY_LOCAL_MACHINE, REG_KEY_NAME, L"CurrentBuild" );
+	logMessage( L"%ws: Detected windows: %ws %ws.%ws", dbgGetPluginName(),
+		productName != NULL ? productName : L"UNKNOWN",
+		currentVersion != NULL ? currentVersion : L"UNKNOWN",
+		currentBuild != NULL ? currentBuild : L"UNKNOWN" );
+	if( productName )
 	{
-		logMessage( L"%ws: This version considered as UNKNOWN", dbgGetPluginName() );
-		MessageBox( NULL, UNABLE_TO_GET_WIN_VERSION, dbgGetPluginName(), MB_OK | MB_ICONERROR );
-		return;
+		delete [] productName;
+		productName = NULL;
+	}
+	if( currentVersion )
+	{
+		delete [] currentVersion;
+		currentVersion = NULL;
+	}
+	if( currentBuild )
+	{
+		delete [] currentBuild;
+		currentBuild = NULL;
 	}
 
-	g_osVersion = osvi;
+	g_osBeingDebuggedOffset = osGetModuleOffsetInStruct( L"ntdll.dll", L"_PEB", L"BeingDebugged" );
+	logMessage(L"%ws: BeingDebugged offset: %08X", dbgGetPluginName(), g_osBeingDebuggedOffset);
 
-	if( !g_osVersion.wServicePackMajor )
-	{
-		logMessage( L"%ws: Detected windows version: %d.%d No Service Pack",
-					dbgGetPluginName(),
-					g_osVersion.dwMajorVersion,
-					g_osVersion.dwMinorVersion );
-	}
-	else
-	{
-		logMessage( L"%ws: Detected windows version: %d.%d Service Pack %d",
-					dbgGetPluginName(),
-					g_osVersion.dwMajorVersion,
-					g_osVersion.dwMinorVersion,
-					g_osVersion.wServicePackMajor );
-	}
+	g_osProcessHeapsOffset = osGetModuleOffsetInStruct( L"ntdll.dll", L"_PEB", L"ProcessHeaps" );
+	logMessage(L"%ws: ProcessHeaps offset: %08X", dbgGetPluginName(), g_osProcessHeapsOffset);
 
-	logMessage( L"%ws: This version considered as Windows %s", dbgGetPluginName(), g_osVersion.detectedVersion.osName );
+	g_osNtGlobalFlagOffset = osGetModuleOffsetInStruct( L"ntdll.dll", L"_PEB", L"NtGlobalFlag" );
+	logMessage(L"%ws: NtGlobalFlag offset: %08X", dbgGetPluginName(), g_osNtGlobalFlagOffset);
 
-	DWORD offset = osGetModuleOffsetInStruct( L"ntdll.dll", L"_PEB", L"BeingDebugged" );
-	logMessage( L"%ws: BeingDebugged offset: %08X", dbgGetPluginName(), offset );
+	g_osFlagsOffset = osGetModuleOffsetInStruct( L"ntdll.dll", L"_HEAP", L"Flags" );
+	logMessage(L"%ws: Flags offset: %08X", dbgGetPluginName(), g_osFlagsOffset );
 
-	logMessage( L"%ws: BeingDebugged offset: %08X", dbgGetPluginName(), g_osVersion.detectedVersion.BeingDebugged );
-	logMessage( L"%ws: ProcessHeaps offset: %08X", dbgGetPluginName(), g_osVersion.detectedVersion.ProcessHeaps );
-	logMessage( L"%ws: NtGlobalFlag offset: %08X", dbgGetPluginName(), g_osVersion.detectedVersion.NtGlobalFlag );
-	logMessage( L"%ws: Flags offset: %08X", dbgGetPluginName(), g_osVersion.detectedVersion.Flags );
-	logMessage( L"%ws: ForceFlags offset: %08X", dbgGetPluginName(), g_osVersion.detectedVersion.ForceFlags );
+	g_osForceFlagsOffset = osGetModuleOffsetInStruct( L"ntdll.dll", L"_HEAP", L"ForceFlags" );
+	logMessage(L"%ws: ForceFlags offset: %08X", dbgGetPluginName(), g_osForceFlagsOffset );
 }
 
 
@@ -327,33 +186,33 @@ bool osDirExists( const wchar_t* dirName )
 // ntdll->_PEB->BeingDebugged
 DWORD osGetBeingDebuggedOffset( void )
 {
-	return g_osVersion.detectedVersion.BeingDebugged;
+	return g_osBeingDebuggedOffset;
 }
 
 
 // ntdll->_PEB->ProcessHeaps
 DWORD osGetProcessHeapsOffset( void )
 {
-	return g_osVersion.detectedVersion.ProcessHeaps;
+	return g_osProcessHeapsOffset;
 }
 
 
 // ntdll->_PEB->NtGlobalFlag
 DWORD osGetNtGlobalFlagOffset( void )
 {
-	return g_osVersion.detectedVersion.NtGlobalFlag;
+	return g_osNtGlobalFlagOffset;
 }
 
 
 // ntdll->_HEAP->Flags
 DWORD osGetFlagsOffset( void )
 {
-	return g_osVersion.detectedVersion.Flags;
+	return g_osFlagsOffset;
 }
 
 
 // ntdll->_HEAP->ForceFlags
 DWORD osGetForceFlagsOffset( void )
 {
-	return g_osVersion.detectedVersion.ForceFlags;
+	return g_osForceFlagsOffset;
 }

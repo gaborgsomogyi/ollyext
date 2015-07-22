@@ -1,3 +1,6 @@
+22.07.2015
+	- OS specific flags read from microsoft symbol server
+
 28.04.2014
 	- Code ripping "0x" prefix changed to "h" postfix
 

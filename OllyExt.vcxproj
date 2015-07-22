@@ -196,6 +196,7 @@ copy debug\OllyExt.dll d:\crk\Analysis\OllyDbg2\plugins\
     <ClCompile Include="Core\Local.cpp" />
     <ClCompile Include="Core\Log.cpp" />
     <ClCompile Include="Core\OS.cpp" />
+    <ClCompile Include="Core\Reg.cpp" />
     <ClCompile Include="Core\Remote.cpp" />
     <ClCompile Include="Core\Res.cpp" />
     <ClCompile Include="Core\Version.cpp" />
@@ -376,6 +377,7 @@ copy debug\OllyExt.dll d:\crk\Analysis\OllyDbg2\plugins\
     <ClInclude Include="Core\Local.h" />
     <ClInclude Include="Core\Log.h" />
     <ClInclude Include="Core\OS.h" />
+    <ClInclude Include="Core\Reg.h" />
     <ClInclude Include="Core\Remote.h" />
     <ClInclude Include="Core\Res.h" />
     <ClInclude Include="Core\Version.h" />
