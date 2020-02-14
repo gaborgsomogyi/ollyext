@@ -1,3 +1,6 @@
+I was just hanging around in my old codes and found this. Maybe someone can make use of it :)
+Not compiling by default because I've removed some proprietary stuff.
+
 OllyExt is a plugin for Olly 2.xx debugger.
 
 The main intention of this plugin is to provide the biggest anti-anti debugging features
